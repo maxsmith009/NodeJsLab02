@@ -1,0 +1,23 @@
+{
+  "name": "expresspart",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "ts-node-dev --respawn --transpileOnly ./bin/www"
+  },
+  "dependencies": {
+    "@types/express": "^4.16.1",
+    "@types/node": "^12.0.2",
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "express": "~4.16.1",
+    "fs-json-store": "^2.3.0",
+    "http-errors": "~1.6.3",
+    "morgan": "~1.9.1",
+    "pug": "2.0.0-beta11",
+    "ts-node": "^8.1.0",
+    "ts-node-dev": "^1.0.0-pre.39",
+    "typescript": "^3.4.5",
+    "uniqid": "^5.0.3"
+  }
+}
