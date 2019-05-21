@@ -1,5 +1,5 @@
 import express from 'express'
-import {getEmployeesById} from "../controllers/employees";
+import {getEmployeesById} from "../servises/employees";
 
 const router = express.Router();
 const uniqid = require('uniqid');
@@ -27,7 +27,7 @@ router.get('/', (req, res) => {
 router.get('/vacation', (req, res) => {
 
     if (!req.query.id) {
-        res.status(404).send('Not found');
+        res.status(404).send('No vacation id');
         return;
     }
 
@@ -41,7 +41,7 @@ router.get('/vacation', (req, res) => {
             if (vacationData) {
                 res.json(vacationData);
             } else {
-                res.status(404).send('Not found');
+                res.status(404).send('No such vacation');
             }
         });
 });
@@ -77,7 +77,7 @@ router.post('/vacation', (req, res) => {
 router.delete('/vacation', (req, res) => {
 
     if (!req.query.id) {
-        res.status(404).send('Not found');
+        res.status(404).send('No vacation id');
         return;
     }
 
@@ -98,7 +98,7 @@ router.delete('/vacation', (req, res) => {
 router.put('/vacation', (req, res) => {
 
     if (!req.query.id) {
-        res.status(404).send('Not found');
+        res.status(404).send('No vacation id');
         return;
     }
 
@@ -113,7 +113,7 @@ router.put('/vacation', (req, res) => {
                         id: el.id,
                         employeeId: body.employeeId || el.employeeId,
                         startDate: body.startDate || el.startDate,
-                        endDate: body.endDate || el.endDate,
+                        endDate: (body.startDate || el.startDate) + ((body.numberOfDays || el.numberOfDays) * 24 * 60 * 60 * 1000),
                         numberOfDays: body.numberOfDays || el.numberOfDays
                     }
                 } else {
@@ -129,25 +129,25 @@ router.put('/vacation', (req, res) => {
         });
 });
 
-router.get('/vacations-of-employee', (req, res) => {
+router.get('/employee-vacations', (req, res) => {
 
     if (!req.query.id) {
-        res.status(404).send('Not found');
+        res.status(404).send('No employee id');
         return;
     }
 
     store
         .read()
         .then((data: any) => {
-            const filteredData = data.filter((el: IVacation)=>{
+            const filteredData = data.filter((el: IVacation) => {
                 return el.employeeId === req.query.id;
             });
             res.json(filteredData);
         });
 });
 
-router.get('/vacations-on-day', (req, res) => {
-const searchDate = req.query.date;
+router.get('/vacations-on-date', (req, res) => {
+    const searchDate = req.query.date;
 
     if (!searchDate) {
         res.status(404).send('No date provided');
@@ -158,19 +158,20 @@ const searchDate = req.query.date;
         .read()
         .then((data: any) => {
             return data
-                .filter((el: IVacation)=>{
-                return Number(el.startDate) < searchDate && searchDate < Number(el.endDate)
-            })
+                .filter((el: IVacation) => {
+                    return Number(el.startDate) < searchDate && searchDate < Number(el.endDate)
+                })
                 .map((el: { employeeId: string; endDate: number; }) => {
-                return {employeeId: el.employeeId,
-                    endDate: el.endDate
-                };
-            });
+                    return {
+                        employeeId: el.employeeId,
+                        endDate: el.endDate
+                    };
+                });
         })
-        .then((data: {employeeId: string, endDate: number}[] ) => getEmployeesById(data))
+        .then((data: any) => getEmployeesById(data))
         .then((data: any) => {
             res.json(data)
-        }) ;
+        });
 });
 
 module.exports = router;

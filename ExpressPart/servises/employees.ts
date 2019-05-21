@@ -4,13 +4,13 @@ const dataDirectory = `store/employees.json`;
 const store = new Store({file: dataDirectory});
 
 
-export const getEmployeesById = (vacationsData: {employeeId: string, endDate: number}[]) => {
+export const getEmployeesById = (vacationsData: { map: (arg0: (el: { employeeId: string; endDate: any; }) => { endDate: any; lastName: any; firstName: any; vacationDaysLeft: any; }) => void; }) => {
 
     return store
         .read()
         .then((employees: any) => {
 
-           return  vacationsData.map((el) => {
+           return  vacationsData.map((el: { employeeId: string; endDate: any; }) => {
 
                 let employee = employees.filter((employee: { id: string; }) => {
                     return employee.id === el.employeeId;

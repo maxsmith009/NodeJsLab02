@@ -1,5 +1,5 @@
 import express from 'express'
-import {createVacation} from "../controllers/vacations";
+import {createVacation} from "../servises/vacations";
 
 const router = express.Router();
 const uniqid = require('uniqid');
@@ -26,7 +26,7 @@ router.get('/', (req, res) => {
 router.get('/employee', (req, res) => {
 
     if (!req.query.id) {
-        res.status(404).send('Not found');
+        res.status(404).send('No employee id');
         return;
     }
 
@@ -40,7 +40,7 @@ router.get('/employee', (req, res) => {
             if (employeeData) {
                 res.json(employeeData);
             } else {
-                res.status(404).send('Not found');
+                res.status(404).send('No such employee');
             }
         });
 });
@@ -73,7 +73,7 @@ router.post('/employee', (req, res) => {
 router.delete('/employee', (req, res) => {
 
     if (!req.query.id) {
-        res.status(404).send('Not found');
+        res.status(404).send('No employee id');
         return;
     }
 
@@ -94,7 +94,7 @@ router.delete('/employee', (req, res) => {
 router.put('/employee', (req, res) => {
 
     if (!req.query.id) {
-        res.status(404).send('Not found');
+        res.status(404).send('No employee id');
         return;
     }
 
@@ -129,7 +129,7 @@ router.post('/new-vacation-request', (req, res) => {
     const body = req.body;
 
     if (!employeeId) {
-        res.status(404).send('Not found');
+        res.status(404).send('No employee id');
         return;
     }
 

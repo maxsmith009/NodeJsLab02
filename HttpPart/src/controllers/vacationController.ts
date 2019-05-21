@@ -1,6 +1,6 @@
-import {ParsedUrlQuery} from "querystring";
-import {IEmployee} from "./employeeController";
-import {EmployeeService} from "../services/employee.service";
+import { ParsedUrlQuery } from "querystring";
+import { IEmployee } from "./employeeController";
+import { EmployeeService } from "../services/employee.service";
 
 const uniqid = require('uniqid');
 const fs = require('fs');
@@ -9,8 +9,8 @@ const EmpService = new EmployeeService();
 export interface IVacation {
     id: string,
     employeeId: string,
-    startDate: string,
-    endDate: string,
+    startDate: number,
+    endDate: number,
     numberOfDays: number
 }
 
@@ -18,12 +18,12 @@ export interface IVacation {
 export default class VacationController implements IVacation {
     id: string;
     employeeId: string;
-    startDate: string;
-    endDate: string;
+    startDate: number;
+    endDate: number;
     numberOfDays: number;
 
 
-    constructor(props: { id: string; employeeId: string; startDate: string; endDate: string; numberOfDays: number; }) {
+    constructor(props: { id: string; employeeId: string; startDate: number; endDate: number; numberOfDays: number; }) {
         this.id = props.id;
         this.employeeId = props.employeeId;
         this.startDate = props.startDate;
@@ -52,6 +52,7 @@ export default class VacationController implements IVacation {
 
     static getVacationsOfEmployee(query: ParsedUrlQuery, res: any) {
         if (!query.id) {
+            res.statusCode = 404;
             res.end("No Employee Id");
             return;
         }
@@ -70,8 +71,9 @@ export default class VacationController implements IVacation {
     static getVacationOnDay(query: ParsedUrlQuery, res: any) {
         fs.readFile('./src/store/vacations.json', 'utf8', (err: Error, data: string) => {
             if (err) throw err;
-            console.log("d");
+
             if (!query.date) {
+                res.statusCode = 400;
                 res.end("No Date");
                 return;
             }
@@ -121,16 +123,19 @@ export default class VacationController implements IVacation {
             if (err) throw err;
 
             if (!vacationData.employeeId) {
+                res.statusCode = 404;
                 res.end("No Employee Id");
                 return;
             }
 
             if (!vacationData.startDate) {
+                res.statusCode = 400;
                 res.end("No Start Date");
                 return;
             }
 
             if (!vacationData.numberOfDays) {
+                res.statusCode = 400;
                 res.end("No number of days");
                 return;
             }
@@ -150,14 +155,14 @@ export default class VacationController implements IVacation {
                     newVacationData.push({
                         id: uniqid(),
                         employeeId: vacationData.employeeId,
-                        startDate: new Date(vacationData.startDate).getTime(),
-                        endDate: new Date(vacationData.startDate + vacationData.numberOfDays * 24 * 60 * 60 * 1000).getTime(),
+                        startDate: vacationData.startDate,
+                        endDate: vacationData.startDate + vacationData.numberOfDays * 24 * 60 * 60 * 1000,
                         numberOfDays: vacationData.numberOfDays
                     });
 
                     EmpService.updateEmployeeData(vacationData.employeeId, {
                         vacationDaysLeft: currentEmployee.vacationDaysLeft - vacationData.numberOfDays
-                    }, ({}, err: Error) => {
+                    }, ({ }, err: Error) => {
                         if (err) throw err;
 
 
@@ -172,6 +177,7 @@ export default class VacationController implements IVacation {
                 })
 
             } else {
+                res.statusCode = 400;
                 res.end("Not enough days");
             }
 
@@ -193,6 +199,7 @@ export default class VacationController implements IVacation {
 
                 res.end(JSON.stringify(response));
             } else {
+                res.statusCode = 404;
                 res.end("No id in request");
             }
 
@@ -214,6 +221,7 @@ export default class VacationController implements IVacation {
                     res.end(JSON.stringify(employeeList));
                 });
             } else {
+                res.statusCode = 404;
                 res.end("No id in request");
             }
 
@@ -233,7 +241,7 @@ export default class VacationController implements IVacation {
                             id: el.id,
                             employeeId: vacationsData.employeeId || el.employeeId,
                             startDate: vacationsData.startDate || el.startDate,
-                            endDate: vacationsData.endDate || el.endDate,
+                            endDate:  (vacationsData.startDate || el.startDate) + (vacationsData.numberOfDays || el.numberOfDays) * 24 * 60 * 60 * 1000,
                             numberOfDays: vacationsData.numberOfDays || el.numberOfDays,
                         }
                     } else {

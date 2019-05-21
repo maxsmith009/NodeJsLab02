@@ -1,5 +1,5 @@
-import {ParsedUrlQuery} from "querystring";
-import {EmployeeService} from "../services/employee.service";
+import { ParsedUrlQuery } from "querystring";
+import { EmployeeService } from "../services/employee.service";
 
 const uniqid = require('uniqid');
 const fs = require('fs');
@@ -53,29 +53,6 @@ export default class EmployeeController implements IEmployee {
         });
     }
 
-    /*    static updateEmployeeData(id: string | string[], employeeData: any, callback: any) {
-            fs.readFile('./src/store/employees.json', 'utf8', (err: Error, data: string) => {
-                if (err) throw err;
-
-                if (id) {
-                    let employeeList = JSON.parse(data).map((el: IEmployee) => {
-                        if (el.id === id) {
-                            return {
-                                id: el.id,
-                                firstName: employeeData.firstName || el.firstName,
-                                lastName: employeeData.lastName || el.lastName,
-                                vacationDaysLeft: employeeData.vacationDaysLeft || el.vacationDaysLeft
-                            }
-                        } else {
-                            return el;
-                        }
-                    });
-
-                    fs.writeFile('./src/store/employees.json', JSON.stringify(employeeList), callback.bind(this, employeeList));
-                }
-            });
-        }*/
-
     private static createEmployee(employeeData: any, res: any) {
         fs.readFile('./src/store/employees.json', 'utf8', (err: Error, data: string) => {
             if (err) throw err;
@@ -95,6 +72,7 @@ export default class EmployeeController implements IEmployee {
                     res.end(JSON.stringify(newEmployeeData));
                 });
             } else {
+                res.statusCode = 400;
                 res.end("Parameters Error");
             }
 
@@ -113,6 +91,7 @@ export default class EmployeeController implements IEmployee {
 
                 res.end(JSON.stringify(response));
             } else {
+                res.statusCode = 404;
                 res.end("No id in request");
             }
 
@@ -134,6 +113,7 @@ export default class EmployeeController implements IEmployee {
                     res.end(JSON.stringify(employeeList));
                 });
             } else {
+                res.statusCode = 404;
                 res.end("No id in request");
             }
 
@@ -143,6 +123,7 @@ export default class EmployeeController implements IEmployee {
     private static updateEmployee(query: ParsedUrlQuery, employeeData: any, res: any) {
 
         if (!query.id) {
+            res.statusCode = 404;
             res.end("No Employee Id");
             return;
         }
@@ -155,4 +136,3 @@ export default class EmployeeController implements IEmployee {
     }
 
 };
-

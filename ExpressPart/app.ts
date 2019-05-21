@@ -27,11 +27,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/employees', employeeRouter);
 app.use('/vacations', vacationRouter);
 
-app.use('/health-check', (req: any, res: { send: (arg0: string) => void; }, next: any) => {
-    res.send(JSON.stringify({
+app.use('/health-check', (req: any, res: { json: (arg0: { startDate: Date; upTime: number; }) => void; }, next: any) => {
+    res.json({
         startDate,
         upTime: getUpTime()
-    }));
+    });
 });
 
 // catch 404 and forward to error handler
